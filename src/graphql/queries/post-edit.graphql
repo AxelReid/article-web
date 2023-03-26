@@ -1,0 +1,7 @@
+query PostEdit($postId: Int!) {
+  post(id: $postId) {
+    id
+    title
+    text
+  }
+}
