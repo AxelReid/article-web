@@ -63,7 +63,6 @@ const ChangePassword: NextPage = () => {
         showNotification({
           color: 'green',
           title: 'Welcome back, ' + user?.username,
-          disallowClose: true,
           autoClose: 1500,
           message: '',
         })

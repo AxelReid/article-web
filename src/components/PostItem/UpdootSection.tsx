@@ -1,33 +1,7 @@
-import { ApolloCache, gql } from '@apollo/client'
 import { Stack, ActionIcon, Text } from '@mantine/core'
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
-import { PostSnippetFragment, useVoteMutation, VoteResponse } from '~/graphql'
-
-const updateFragment = (
-  postId: number,
-  cache: ApolloCache<any>,
-  incoming: VoteResponse | undefined
-) => {
-  if (incoming)
-    cache.writeFragment({
-      id: 'Post:' + postId,
-      fragment: gql`
-        fragment _ on Post {
-          updoots {
-            value
-            updatedPoints
-          }
-        }
-      `,
-      data: {
-        updoots: {
-          value: incoming.value,
-          updatedPoints: incoming.updatedPoints,
-        },
-      },
-    })
-}
+import { PostSnippetFragment, useVoteMutation } from '~/graphql'
 
 interface Props {
   post: PostSnippetFragment
