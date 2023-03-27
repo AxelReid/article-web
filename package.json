@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen": "graphql-codegen --config codegen.ts"
+    "gen": "graphql-codegen --config codegen.ts -r dotenv/config"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^3.2.1",
