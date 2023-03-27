@@ -1,5 +1,6 @@
 mutation Login($userLoginInput: UserLoginInput!) {
   login(userLoginInput: $userLoginInput) {
     ...RegularUserResponse
+    token
   }
 }

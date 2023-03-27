@@ -1,5 +1,6 @@
 mutation Register($userRegisterInput: UserRegisterInput!) {
   register(userRegisterInput: $userRegisterInput) {
     ...RegularUserResponse
+    token
   }
 }

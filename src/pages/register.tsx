@@ -14,13 +14,9 @@ import { showNotification } from '@mantine/notifications'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import NavBar from '../components/NavBar'
-import {
-  MeDocument,
-  MeQuery,
-  useRegisterMutation,
-  UserRegisterInput,
-} from '~/graphql'
+import { useRegisterMutation, UserRegisterInput } from '~/graphql'
 import withApollo from '~/utils/withApollo'
+import setToken from '~/utils/setToken'
 
 const Register: NextPage = () => {
   const router = useRouter()
@@ -43,15 +39,15 @@ const Register: NextPage = () => {
         variables: {
           userRegisterInput: vals,
         },
-        update: (cache, { data }) => {
-          cache.writeQuery<MeQuery>({
-            query: MeDocument,
-            data: {
-              __typename: 'Query',
-              me: data?.register.user,
-            },
-          })
-        },
+        // update: (cache, { data }) => {
+        //   cache.writeQuery<MeQuery>({
+        //     query: MeDocument,
+        //     data: {
+        //       __typename: 'Query',
+        //       me: data?.register.user,
+        //     },
+        //   })
+        // },
       })
       const errors = res.data?.register.errors
       if (errors) {
@@ -59,16 +55,18 @@ const Register: NextPage = () => {
           form.setFieldError(err.field, err.message)
         }
       } else {
-        const user = res.data?.register.user
-        const callBackUrl = router.query?.callbackUrl as string
-        router.push(callBackUrl || '/')
+        const data = res.data?.register
+        setToken(data?.token as string)
         showNotification({
           color: 'green',
-          title: 'Welcome back, ' + user?.username,
+          title: 'Welcome back, ' + data?.user?.username,
           withCloseButton: false,
           autoClose: 1500,
           message: '',
         })
+        const callBackUrl = router.query?.callbackUrl as string
+        // router.push(callBackUrl || '/')
+        location.replace(callBackUrl || '/')
       }
     } catch (error) {
       showNotification({

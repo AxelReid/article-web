@@ -2,16 +2,20 @@ import { withApollo } from 'next-apollo'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { PaginatedPosts } from '~/graphql'
 import { NextPageContext } from 'next'
+import { getCookie } from 'cookies-next'
 
-const createClient = (ctx?: NextPageContext) =>
-  new ApolloClient({
+const createClient = (ctx?: NextPageContext) => {
+  const token = getCookie('token', ctx)
+
+  return new ApolloClient({
     uri: process.env.NEXT_PUBLIC_API_URL as string,
     credentials: 'include',
     headers: {
-      cookie:
-        (typeof window === 'undefined'
-          ? ctx?.req?.headers.cookie
-          : undefined) || '',
+      // cookie:
+      //   (typeof window === 'undefined'
+      //     ? ctx?.req?.headers.cookie
+      //     : undefined) || '',
+      authorization: token ? `Bearer ${token}` : '',
     },
     cache: new InMemoryCache({
       typePolicies: {
@@ -32,5 +36,6 @@ const createClient = (ctx?: NextPageContext) =>
       },
     }),
   })
+}
 
 export default withApollo(createClient)

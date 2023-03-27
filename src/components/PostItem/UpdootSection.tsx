@@ -1,4 +1,5 @@
 import { Stack, ActionIcon, Text } from '@mantine/core'
+import { showNotification } from '@mantine/notifications'
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { PostSnippetFragment, useVoteMutation } from '~/graphql'
@@ -24,12 +25,25 @@ const UpdootSection: React.FC<Props> = ({ post, isAuthed }) => {
 
   const vote = useCallback(
     async (action: LoadingType) => {
-      if (!isAuthed) return
-      handleLoading(action)
-      await mutate({
-        variables: { postId: post.id, value: action === 'up' ? 1 : -1 },
-      })
-      handleLoading()
+      const notifyErr = (err: string) =>
+        showNotification({
+          color: 'red',
+          message: err,
+        })
+      if (!isAuthed) {
+        notifyErr('Login first!')
+        return
+      }
+      try {
+        handleLoading(action)
+        await mutate({
+          variables: { postId: post.id, value: action === 'up' ? 1 : -1 },
+        })
+      } catch (error: any) {
+        notifyErr(error?.message)
+      } finally {
+        handleLoading()
+      }
     },
     [mutate, post.id, isAuthed]
   )
@@ -43,7 +57,7 @@ const UpdootSection: React.FC<Props> = ({ post, isAuthed }) => {
         onClick={() => vote('up')}
         loading={loading === 'up'}
         loaderProps={{ w: 12, h: 12 }}
-        variant={status === 1 ? 'light' : 'subtle'}
+        variant={!isAuthed ? 'transparent' : status === 1 ? 'light' : 'subtle'}
         color={status === 1 ? 'green' : 'gray'}
       >
         <IconChevronUp />
@@ -58,7 +72,7 @@ const UpdootSection: React.FC<Props> = ({ post, isAuthed }) => {
         onClick={() => vote('down')}
         loading={loading === 'down'}
         loaderProps={{ w: 12, h: 12 }}
-        variant={status === -1 ? 'light' : 'subtle'}
+        variant={!isAuthed ? 'transparent' : status === -1 ? 'light' : 'subtle'}
         color={status === -1 ? 'red' : 'gray'}
       >
         <IconChevronDown />

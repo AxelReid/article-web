@@ -10,16 +10,19 @@ import {
 } from '@mantine/core'
 import Link from 'next/link'
 import { callbackUrl } from '~/utils/callbackUrl'
-import { useLogoutMutation, useMeQuery } from '~/graphql'
+import { useMeQuery } from '~/graphql'
 import { IconMoon, IconPlus, IconSun } from '@tabler/icons-react'
 import { memo, useRef } from 'react'
 import { ModalMutableRefProps } from '~/types/modalRef'
 import CreatePostModal from './Modal/CreatePostModal'
+import { deleteCookie } from 'cookies-next'
+import { useRouter } from 'next/router'
 
 const NavBar: React.FC = () => {
+  const router = useRouter()
   const modalRef: ModalMutableRefProps<number> = useRef(null)
   const { data } = useMeQuery()
-  const [logout, { client }] = useLogoutMutation()
+  // const [logout, { client }] = useLogoutMutation()
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   const themeIcon =
     colorScheme === 'dark' ? (
@@ -27,16 +30,17 @@ const NavBar: React.FC = () => {
     ) : (
       <IconMoon size={22} strokeWidth={1.5} opacity={0.7} />
     )
+  const logout = () => {
+    deleteCookie('token', { secure: true, httpOnly: false, sameSite: 'lax' })
+    router.reload()
+  }
 
   let content = <></>
   if (data?.me)
     content = (
       <>
         <Text
-          onClick={async () => {
-            await logout()
-            client.resetStore()
-          }}
+          onClick={logout}
           size='sm'
           fw={500}
           variant='link'

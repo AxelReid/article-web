@@ -15,13 +15,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef } from 'react'
 import ForgotPassModal from '~/components/Modal/ForgotPassModal'
-import {
-  MeDocument,
-  MeQuery,
-  useLoginMutation,
-  UserLoginInput,
-} from '~/graphql'
+import { useLoginMutation, UserLoginInput } from '~/graphql'
 import { ModalMutableRefProps } from '~/types/modalRef'
+import setToken from '~/utils/setToken'
 import withApollo from '~/utils/withApollo'
 import NavBar from '../components/NavBar'
 
@@ -43,16 +39,16 @@ const Login: NextPage = () => {
         variables: {
           userLoginInput: vals,
         },
-        update: (cache, { data }) => {
-          cache.writeQuery<MeQuery>({
-            query: MeDocument,
-            data: {
-              __typename: 'Query',
-              me: data?.login.user,
-            },
-          })
-          cache.evict({ fieldName: 'posts' })
-        },
+        // update: (cache, { data }) => {
+        //   cache.writeQuery<MeQuery>({
+        //     query: MeDocument,
+        //     data: {
+        //       __typename: 'Query',
+        //       me: data?.login.user,
+        //     },
+        //   })
+        //   cache.evict({ fieldName: 'posts' })
+        // },
       })
       const errors = res.data?.login.errors
       if (errors) {
@@ -60,21 +56,23 @@ const Login: NextPage = () => {
           form.setFieldError(err.field, err.message)
         }
       } else {
-        const user = res.data?.login.user
-        const callBackUrl = router.query?.callbackUrl as string
-        router.push(callBackUrl || '/')
+        const data = res.data?.login
+        setToken(data?.token as string)
         showNotification({
           color: 'green',
-          title: 'Welcome back, ' + user?.username,
+          title: 'Welcome back, ' + data?.user?.username,
           withCloseButton: false,
           autoClose: 1500,
           message: '',
         })
+        const callBackUrl = router.query?.callbackUrl as string
+        // router.push(callBackUrl || '/')
+        window.location.replace(callBackUrl || '/')
       }
-    } catch (error) {
+    } catch (error: any) {
       showNotification({
         color: 'red',
-        title: 'Something went wrong. Try again!',
+        title: error?.message || 'Something went wrong. Try again!',
         message: '',
       })
     }
@@ -107,7 +105,7 @@ const Login: NextPage = () => {
               Register
             </Anchor>
           </Box>
-          <Box fz='sm'>
+          {/* <Box fz='sm'>
             <Text span>Forgot password?</Text>{' '}
             <Anchor
               onClick={() =>
@@ -116,7 +114,7 @@ const Login: NextPage = () => {
             >
               Reset
             </Anchor>
-          </Box>
+          </Box> */}
         </Box>
       </Container>
       <ForgotPassModal ref={modalRef} />
