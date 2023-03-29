@@ -2,7 +2,6 @@ import {
   AspectRatio,
   Badge,
   Box,
-  Card,
   Flex,
   Text,
   useMantineColorScheme,
@@ -11,8 +10,6 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { memo, useMemo } from 'react'
 import { PostSnippetFragment } from '~/graphql'
-import ActionsSection from './ActionsSection'
-import UpdootSection from './UpdootSection'
 const TypographyStylesProvider = dynamic(
   () => import('@mantine/core').then((mod) => mod.TypographyStylesProvider),
   { ssr: false }
