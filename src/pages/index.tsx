@@ -1,4 +1,4 @@
-import { Box, Button, Container, Grid } from '@mantine/core'
+import { Box, Button, Container, Divider } from '@mantine/core'
 import { NextPage } from 'next'
 import { useRef } from 'react'
 import CreatePostModal from '~/components/Modal/CreatePostModal'
@@ -7,6 +7,7 @@ import NavBar from '../components/NavBar'
 import { useMeQuery, usePostsQuery } from '~/graphql'
 import withApollo from '~/utils/withApollo'
 import PostItem from '~/components/PostItem'
+import React from 'react'
 
 const Home: NextPage = () => {
   const { data, loading, fetchMore, variables } = usePostsQuery({
@@ -30,17 +31,19 @@ const Home: NextPage = () => {
           ) : !loading && !data?.posts.posts ? (
             'No data to show'
           ) : (
-            <Grid>
-              {data?.posts.posts.map((post) => (
-                <Grid.Col key={post.id} span={12} xs={6} md={4}>
+            <>
+              {data?.posts.posts.map((post, i) => (
+                <React.Fragment key={post.id}>
+                  {i ? <Divider key={'divider-' + i} my={'xl'} /> : null}
                   <PostItem
+                    key={'item-' + post.id}
                     userId={user?.me?.id}
                     post={post}
                     openEdit={() => modalRef.current?.open(post.id)}
                   />
-                </Grid.Col>
+                </React.Fragment>
               ))}
-            </Grid>
+            </>
           )}
         </Box>
         {!!data?.posts.hasMore && (
@@ -57,25 +60,6 @@ const Home: NextPage = () => {
                   cursor:
                     data.posts.posts[data.posts.posts.length - 1].createdAt,
                 },
-                // updateQuery(
-                //   previousQueryResult,
-                //   { fetchMoreResult, variables }
-                // ) {
-                //   if (!fetchMoreResult) {
-                //     return previousQueryResult
-                //   }
-                //   return {
-                //     __typename: 'Query',
-                //     posts: {
-                //       __typename: 'PaginatedPosts',
-                //       hasMore: fetchMoreResult.posts.hasMore,
-                //       posts: [
-                //         ...previousQueryResult.posts.posts,
-                //         ...fetchMoreResult.posts.posts,
-                //       ],
-                //     },
-                //   }
-                // },
               })
             }}
           >

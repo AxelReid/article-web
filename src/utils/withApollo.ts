@@ -4,11 +4,6 @@ import { PaginatedPosts } from '~/graphql'
 import { NextPageContext } from 'next'
 import { getCookie } from 'cookies-next'
 
-// cookie:
-//   (typeof window === 'undefined'
-//     ? ctx?.req?.headers.cookie
-//     : undefined) || '',
-
 const createClient = (ctx?: NextPageContext) => {
   const token = getCookie('token', ctx)
   return new ApolloClient({
